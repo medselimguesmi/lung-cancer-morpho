@@ -1,0 +1,4 @@
+resample_mm: 1.0
+thr: -320
+r_open: 2
+r_close: 8
