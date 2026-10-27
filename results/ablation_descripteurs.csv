@@ -1,0 +1,5 @@
+variante,n_descripteurs,auc_test,sens_a_4FP,sens_a_10FP,delta_auc
+tous les descripteurs,17,0.842,0.263,0.316,0.0
+sans gradient,16,0.839,0.263,0.316,-0.003
+sans squelette,13,0.894,0.316,0.316,0.052
+sans descripteurs de forme,14,0.781,0.158,0.211,-0.061

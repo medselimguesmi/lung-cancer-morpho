@@ -1,0 +1,7 @@
+variante,rappel_dev,fp_par_scan_dev,rappel_test,fp_par_scan_test,delta_rappel_test,delta_fp_test,etape_retiree
+chaîne complète,0.88,215.6,0.579,221.7,0.0,0.0,
+sans ouverture (segmentation),0.88,222.1,0.632,230.9,0.053,9.2,ouverture (segmentation)
+sans fermeture,0.68,169.6,0.368,192.7,-0.211,-29.0,fermeture + remplissage des trous
+sans watershed,0.72,18.3,0.421,18.5,-0.158,-203.2,watershed
+sans troncature,0.84,129.4,0.526,126.0,-0.053,-95.7,troncature en boule autour du pic
+sans squelette,0.88,215.7,0.579,221.7,0.0,0.0,squelette + filtre de forme

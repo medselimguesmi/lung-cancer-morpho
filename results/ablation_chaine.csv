@@ -1,0 +1,13 @@
+etape,morphologie
+rééchantillonnage + fenêtrage HU,False
+seuillage du poumon,False
+ouverture (segmentation),True
+fermeture + remplissage des trous,True
+seuillage des objets denses,False
+transformée de distance + marqueurs,True
+watershed,True
+troncature en boule autour du pic,True
+squelette + filtre de forme,True
+gradient morphologique (descripteur),True
+descripteurs de texture (GLCM) et d'intensité,False
+classification (règles / ML / CNN),False

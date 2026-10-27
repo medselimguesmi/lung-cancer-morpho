@@ -3,11 +3,13 @@ thr: -320
 r_open: 2
 r_close: 8
 candidate_intensity_threshold: -320
-candidate_min_seed_radius_mm: 1.5
-candidate_min_distance_mm: 10.0
+candidate_min_seed_radius_mm: 1.2
+candidate_min_distance_mm: 8.0
 candidate_min_diameter_mm: 3.0
 candidate_max_diameter_mm: 30.0
-candidate_max_skeleton_ratio: 1.2
-candidate_max_branch_points: 1
+candidate_max_skeleton_ratio: 3.0
+candidate_max_branch_points: 3
 morphology_gradient_radius: 1
 morphology_tophat_radius: 3
+candidate_opening_radius: 0
+candidate_truncate_factor: 1.3

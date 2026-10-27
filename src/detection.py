@@ -2,7 +2,7 @@ import numpy as np
 from scipy import ndimage as ndi
 from scipy.optimize import linear_sum_assignment
 from skimage.feature import peak_local_max
-from skimage.morphology import skeletonize
+from skimage.morphology import ball, skeletonize
 from skimage.segmentation import watershed
 
 
@@ -32,6 +32,27 @@ def white_tophat(image, radius=3):
     return values - ndi.grey_opening(values, footprint=footprint)
 
 
+def _truncate_to_ball(region, distance, spacing, factor):
+    """Garde la partie de la région dans une boule centrée sur son pic de distance.
+
+    Rayon de la boule = factor x rayon du pic : coupe les vaisseaux ou la paroi
+    attachés au nodule avant le filtrage par squelette.
+    """
+    masked = np.where(region, distance, -1.0)
+    peak = np.array(np.unravel_index(np.argmax(masked), region.shape))
+    radius_mm = factor * float(masked[tuple(peak)])
+    half = np.ceil(radius_mm / spacing).astype(int) + 1
+    lo = np.maximum(peak - half, 0)
+    hi = np.minimum(peak + half + 1, region.shape)
+    box = tuple(slice(int(a), int(b)) for a, b in zip(lo, hi))
+    grid = np.indices(region[box].shape).astype(np.float32)
+    offsets = (grid - (peak - lo).reshape(3, 1, 1, 1)) * spacing.reshape(3, 1, 1, 1)
+    inside = (offsets ** 2).sum(axis=0) <= radius_mm ** 2
+    truncated = np.zeros_like(region)
+    truncated[box] = region[box] & inside
+    return truncated
+
+
 def find_candidates(
     volume,
     lung_mask,
@@ -43,6 +64,9 @@ def find_candidates(
     max_diameter_mm=30.0,
     max_skeleton_ratio=2.5,
     max_branch_points=3,
+    opening_radius=0,
+    use_watershed=True,
+    truncate_factor=0.0,
     return_intermediates=False,
 ):
     """Détecte des régions candidates dans un volume HU et un masque pulmonaire.
@@ -78,6 +102,8 @@ def find_candidates(
     cropped_volume = volume[crop]
     cropped_lung = lung_mask[crop]
     object_mask = cropped_lung & (cropped_volume >= intensity_threshold)
+    if opening_radius > 0:  # détache les nodules des vaisseaux fins
+        object_mask = ndi.binary_opening(object_mask, structure=ball(opening_radius))
     if not object_mask.any():
         labels = np.zeros(object_mask.shape, dtype=np.int32)
         candidates = []
@@ -91,7 +117,9 @@ def find_candidates(
             labels=object_mask,
             exclude_border=False,
         )
-        if len(peaks):
+        if not use_watershed:  # ablation : composantes connexes brutes
+            labels = ndi.label(object_mask)[0].astype(np.int32)
+        elif len(peaks):
             markers = np.zeros(object_mask.shape, dtype=np.int32)
             markers[tuple(peaks.T)] = np.arange(1, len(peaks) + 1, dtype=np.int32)
             labels = watershed(-distance, markers, mask=object_mask).astype(np.int32)
@@ -101,15 +129,21 @@ def find_candidates(
         voxel_volume = float(np.prod(spacing))
         voxel_length = float(np.cbrt(voxel_volume))
         candidates = []
+        rejected = []
         skeleton_volume = np.zeros(labels.shape, dtype=bool) if return_intermediates else None
         for candidate_id, slices in enumerate(ndi.find_objects(labels), start=1):
             if slices is None:
                 continue
             region = labels[slices] == candidate_id
+            if truncate_factor > 0:
+                region = _truncate_to_ball(region, distance[slices], spacing, truncate_factor)
             voxel_count = int(region.sum())
             volume_mm3 = voxel_count * voxel_volume
             diameter_mm = float(np.cbrt(6.0 * volume_mm3 / np.pi))
             if not min_diameter_mm <= diameter_mm <= max_diameter_mm:
+                if return_intermediates:
+                    rejected.append({"label": candidate_id, "reason": "diameter",
+                                     "diameter_mm": diameter_mm})
                 continue
 
             skeleton = skeletonize(region)
@@ -122,12 +156,18 @@ def find_candidates(
             branch_points = int(np.count_nonzero(skeleton & (skeleton_neighbors >= 3)))
             if (skeleton_length_mm / max(diameter_mm, 1e-6) > max_skeleton_ratio
                     or branch_points > max_branch_points):
+                if return_intermediates:
+                    rejected.append({"label": candidate_id, "reason": "skeleton",
+                                     "diameter_mm": diameter_mm,
+                                     "skeleton_ratio": skeleton_length_mm / max(diameter_mm, 1e-6),
+                                     "branch_points": branch_points})
                 continue
 
             local_center = np.argwhere(region).mean(axis=0)
             center = local_center + np.array([axis.start for axis in slices]) + lower
             candidate = {
                 "candidate_id": len(candidates) + 1,
+                "label_id": int(candidate_id),
                 "z_voxel": float(center[0]),
                 "y_voxel": float(center[1]),
                 "x_voxel": float(center[2]),
@@ -152,6 +192,7 @@ def find_candidates(
         "watershed_labels": labels,
         "skeleton": skeleton_volume if object_mask.any() else np.zeros(labels.shape, dtype=bool),
         "crop_origin_zyx": tuple(int(value) for value in lower),
+        "rejected": rejected if object_mask.any() else [],
     }
     return candidates, intermediates
 

@@ -128,6 +128,8 @@ def process_scan(patient, annotations, config, luna_dir, figure_dir):
         max_diameter_mm=config["candidate_max_diameter_mm"],
         max_skeleton_ratio=config["candidate_max_skeleton_ratio"],
         max_branch_points=config["candidate_max_branch_points"],
+        opening_radius=config.get("candidate_opening_radius", 0),
+        truncate_factor=config.get("candidate_truncate_factor", 0.0),
         return_intermediates=True,
     )
     elapsed = time.time() - started

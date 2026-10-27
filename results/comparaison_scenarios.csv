@@ -1,0 +1,4 @@
+scenario,sensibilite,specificite,precision,f1,auc_roc,TP,FP,FN,TN,sens_a_1FP,sens_a_4FP,temps_s,donnees
+A : morphologie seule,0.091,0.986,0.032,0.048,0.748,1,30,10,2187,0.053,0.053,0.1,aucune (règles)
+B : morphologie + ML,0.091,0.999,0.25,0.133,0.842,1,3,10,2214,0.105,0.263,0.65,descripteurs (~dev)
+C : morphologie + CNN 3D,0.818,0.646,0.011,0.022,0.866,9,784,2,1433,0.105,0.158,869.4,patchs 3D (~dev)
