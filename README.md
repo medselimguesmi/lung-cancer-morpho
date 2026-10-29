@@ -109,6 +109,23 @@ sans effet net ; squelette sans effet dans la configuration finale (la troncatur
 filtre inopérant). Côté descripteurs, retirer ceux de forme (sphéricité, solidité,
 élongation) coûte 0,06 d'AUC ; le gradient seul n'apporte presque rien.
 
+## Figures
+
+Détection : CT, masque pulmonaire, gradient, top-hat, watershed, squelettes retenus et annotation
+(une figure par scan dans `results/detection_figures/`).
+
+![Exemple de détection](results/detection_figures/1.3.6.1.4.1.14519.5.2.1.6279.6001.104562737760173137525888934217.png)
+
+Comparaison des scénarios A, B et C sur le jeu de test :
+
+| ROC | FROC |
+|---|---|
+| ![ROC](results/figures/roc.png) | ![FROC](results/figures/froc.png) |
+
+Analyse d'erreurs (scénario B) : faux positifs les mieux notés et nodules les moins bien notés.
+
+![Erreurs](results/figures/erreurs.png)
+
 ## Limites
 
 25 patients, 33 candidats positifs au total, un seul jeu de données, pas de validation
