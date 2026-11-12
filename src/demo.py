@@ -80,7 +80,7 @@ def main():
     fig.savefig(out, dpi=130, bbox_inches="tight")
     print("figure :", out)
     print(f"candidats : {len(cand)} | retenus (score>={args.threshold}) : {len(kept)} | "
-          f"nodules annotes retrouves : {int(((cand.label == 1) & (cand.score >= args.threshold)).sum())}/"
+          f"candidats positifs retenus : {int(((cand.label == 1) & (cand.score >= args.threshold)).sum())}/"
           f"{int((cand.label == 1).sum())}")
 
 

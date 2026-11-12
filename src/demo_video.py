@@ -211,7 +211,7 @@ def main():
             writer.append_data(f)
     print(f"video : {out}  ({len(frames) / FPS:.0f} s)")
     print(f"candidats : {len(cand)} | retenus : {n_kept} | "
-          f"nodules annotes retrouves : {int(((cand.label == 1) & (cand.score >= args.threshold)).sum())}/"
+          f"candidats positifs retenus : {int(((cand.label == 1) & (cand.score >= args.threshold)).sum())}/"
           f"{int((cand.label == 1).sum())}")
 
 

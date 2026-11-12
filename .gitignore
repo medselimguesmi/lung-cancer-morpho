@@ -8,3 +8,5 @@ NOTE_POUR_SELIM.txt
 *.pdf
 Presentation.pptx
 PRESENTATION.md
+images_presentation/
+demo_app.py
