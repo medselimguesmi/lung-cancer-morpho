@@ -3,3 +3,6 @@ data/
 .ipynb_checkpoints/
 __pycache__/
 *.zip
+
+NOTE_POUR_SELIM.txt
+*.pdf
