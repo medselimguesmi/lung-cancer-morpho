@@ -62,6 +62,7 @@ python src/metrics.py                    # phase 5 : tableau, ROC, FROC
 python src/ablation.py                   # phase 5 : ablation
 python src/error_analysis.py             # phase 5 : erreurs
 python src/demo.py                       # demo : scanner, masque, candidats, decision (results/demo/)
+python src/demo_video.py                 # video mp4 des etapes de detection (results/demo/)
 ```
 
 `run_detection.py --limit N` écrase `results/candidates.csv` et `detection_eval.csv` : à éviter
